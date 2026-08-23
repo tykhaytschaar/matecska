@@ -1,0 +1,11 @@
+build/
+*.o
+*.lst
+*.map
+*.sym
+*.ihx
+*.rel
+*.asm
+*.noi
+__pycache__/
+.DS_Store
