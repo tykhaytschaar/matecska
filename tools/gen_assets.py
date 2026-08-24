@@ -1,6 +1,10 @@
 from sprites import *
 from PIL import Image
 
+# effekt-ikonok egy 16x16-os frame-ben: bal oszlop = sziv, jobb = csepp
+# (8x16 OBJ modban a bal fel onmagaban hasznalhato sziv-sprite-nak stb.)
+FX_ICONS = [HEART[y] + DROP[y] for y in range(8)] + ["." * 16] * 8
+
 FRAMES = [
     ("cat_down_a", CAT_DOWN_A), ("cat_down_b", CAT_DOWN_B),
     ("cat_dl_a", CAT_DL_A),     ("cat_dl_b", CAT_DL_B),
@@ -8,6 +12,7 @@ FRAMES = [
     ("cat_happy_a", CAT_HAPPY), ("cat_happy_b", CAT_HAPPY_B),
     ("cat_yuck_a", CAT_YUCK),   ("cat_yuck_b", CAT_YUCK_B),
     ("bowl_fish", BOWL_FISH),   ("bowl_kibble", BOWL_KIBBLE), ("bowl_veg", BOWL_VEG),
+    ("fx_icons", FX_ICONS),
 ]
 IDX = {'.': 0, 'L': 1, 'M': 2, 'D': 3}
 
@@ -40,9 +45,10 @@ for name, rows in FRAMES:
     data = []
     for cx in (0, 8):
         data += tile_bytes(rows, cx, 0) + tile_bytes(rows, cx, 8)
-    body = ",".join("0x%02X" % b for b in data)
     L.append("const uint8_t %s[64] = {" % name)
-    L += ["    " + body[i:i+72] for i in range(0, len(body), 72)]
+    for i in range(0, len(data), 12):
+        chunk = ",".join("0x%02X" % b for b in data[i:i+12])
+        L.append("    " + chunk + ("," if i + 12 < len(data) else ""))
     L.append("};\n")
 L += ["/* animacios sorrend */",
       "const uint8_t anim_eat[4]   = {4,5,6,5};   /* 6 kepkocka/frame, 3x */",

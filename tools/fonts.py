@@ -41,7 +41,55 @@ F3 = {
     ')': [".D.", "..D", "..D", "..D", ".D."],
     ':': ["...", ".D.", "...", ".D.", "..."],
     '.': ["...", "...", "...", "...", ".D."],
+    '/': ["..D", "..D", ".D.", "D..", "D.."],
     ' ': ["...", "...", "...", "...", "..."],
+}
+
+# 3x7 ekezetes nagybetuk: 2 sor ekezet + a 3x5-os torzs.
+# Az ekezet tulnyulhat a 3 px-es torzson (a tile 8 szeles): a dupla ekezet
+# ket parhuzamos, dontott vonas 4 px-en - igy ranezesre mas, mint az umlaut.
+def _acc(accent2rows, base):
+    return accent2rows + F3[base]
+
+F3_ACC = {}          # kulcs: unicode betu, ertek: 7 soros pixel-terkep
+def _mk_acc():
+    acute  = ["..D", ".D."]
+    uml    = ["...", "D.D"]
+    dacute = [".D.D", "D.D."]
+    for ch, acc, base in [
+        ('Á', acute, 'A'), ('É', acute, 'E'), ('Í', acute, 'I'),
+        ('Ó', acute, 'O'), ('Ö', uml, 'O'), ('Ő', dacute, 'O'),
+        ('Ú', acute, 'U'), ('Ü', uml, 'U'), ('Ű', dacute, 'U'),
+    ]:
+        F3_ACC[ch] = _acc(acc, base)
+_mk_acc()
+
+# teljes 8x8-as specialis tile-ok (HUD ikonok, keret, vonal)
+_E = "........"
+_F = "DDDDDDDD"
+_L = "D......."
+_R = ".......D"
+
+SPECIAL = {
+    'HEART': [
+        "........",
+        ".DD.DD..",
+        "DDDDDDD.",
+        "DDDDDDD.",
+        ".DDDDD..",
+        "..DDD...",
+        "...D....",
+        "........",
+    ],
+    'RULE':     [_F, _E, _E, _E, _E, _E, _E, _E],   # HUD alatti vonal
+    'FRAME_TL': [_F, _L, _L, _L, _L, _L, _L, _L],
+    'FRAME_T':  [_F, _E, _E, _E, _E, _E, _E, _E],
+    'FRAME_TR': [_F, _R, _R, _R, _R, _R, _R, _R],
+    'FRAME_L':  [_L, _L, _L, _L, _L, _L, _L, _L],
+    'FRAME_R':  [_R, _R, _R, _R, _R, _R, _R, _R],
+    'FRAME_BL': [_L, _L, _L, _L, _L, _L, _L, _F],
+    'FRAME_B':  [_E, _E, _E, _E, _E, _E, _E, _F],
+    'FRAME_BR': [_R, _R, _R, _R, _R, _R, _R, _F],
 }
 
 # 5x7 title font

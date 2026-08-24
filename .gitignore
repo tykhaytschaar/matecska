@@ -9,3 +9,4 @@ build/
 *.noi
 __pycache__/
 .DS_Store
+.venv/

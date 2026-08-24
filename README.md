@@ -8,20 +8,24 @@ fanyalog.
 
 ## Allapot
 
-Latvanyterv es sprite-ok keszen, a feladatgenerator mukodik es tesztelt.
-A GB-oldali megjelenites vazlat szinten van meg.
+Jatszahato: cim-animacio, fomenu (uj jatek / folytatas SRAM-mentesbol),
+7 feladattipus 5-os szettekben, pontozas/eletek/szintlepes.
 
 | resz | allapot |
 |---|---|
 | sprite-ok + animaciok | kesz (`src/sprites.h`) |
 | latvanyterv | kesz (`design/`) |
-| feladatgenerator | kesz, tesztelt (`make test`) |
-| allapotgep vaz | kesz (`src/main.c`) |
-| font tile-ok, szovegkiiras | hianyzik |
-| hattergrafika, HUD | hianyzik |
+| feladatgenerator, 7 tema + regiszter | kesz, tesztelt (`make test`) |
+| menuk (fomenu, temavalaszto) | kesz |
+| allapotgep, szett/pont/szint logika | kesz (`src/main.c`) |
+| font (ekezetes) + szovegkiiras | kesz (`src/font.h`, `render.c`) |
+| SRAM mentes (folytatas) | kesz |
+| hattergrafika, HUD | alap kesz; keret/sotet sav hianyzik |
 | hang | hianyzik |
 
 ## Gyorsindulas
+
+Kornyezet telepitese lepesrol lepesre: **[SETUP.md](SETUP.md)**
 
 ```sh
 export GBDK_HOME=$HOME/gbdk
