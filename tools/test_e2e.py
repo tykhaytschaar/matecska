@@ -38,7 +38,7 @@ def load_symbols():
     for line in open(NOI):
         m = re.match(r"DEF _(\w+) 0x([0-9A-Fa-f]+)", line)
         if m: syms[m.group(1)] = int(m.group(2), 16)
-    for need in ("g_state", "g_lives", "g_level", "g_cursor", "mg_mul_seen"):
+    for need in ("g_state", "g_lives", "g_level", "g_cursor", "mg_mul_seen", "_cpu"):
         if need not in syms: die("hianyzo szimbolum a .noi-ban: " + need)
     return syms
 
@@ -46,6 +46,7 @@ class Game:
     def __init__(self, py, sym):
         self.py, self.sym = py, sym
     def mem(self, name): return self.py.memory[self.sym[name]]
+    def vram(self, a): return self.py.memory[0, a]   # VRAM 0. bank, VBK-tol fuggetlenul
     def state(self): return self.mem("g_state")
     def tick(self, n=1):
         for _ in range(n): self.py.tick()
@@ -65,14 +66,17 @@ class Game:
         teljesitett tema (nincs szam) nem szerepel"""
         out = {}
         for i in range(TOPICS):
-            t = self.py.memory[0x9800 + (4 + 2 * i) * 32 + 1]
+            t = self.vram(0x9800 + (4 + 2 * i) * 32 + 1)
             if t >= INV_BASE: t -= INV_BASE          # kijelolt (invertalt) sor
             if TILE_DIGIT0 < t <= TILE_DIGIT0 + 9:
                 out[i] = t - TILE_DIGIT0
         return out
 
+    def tilemap(self):
+        return bytes(self.py.memory[0, 0x9800:0x9800 + 18 * 32])
+
     def row_inverted(self, i):
-        return self.py.memory[0x9800 + (4 + 2 * i) * 32 + 3] >= INV_BASE
+        return self.vram(0x9800 + (4 + 2 * i) * 32 + 3) >= INV_BASE
 
     def to_topic_from_boot(self, cont=False):
         self.tick(120)
@@ -80,7 +84,7 @@ class Game:
             self.press("start")
         self.tick(4)
         # verzio a logo alatt (4. sor): "V<major>.<minor>.<patch>"
-        row = [self.py.memory[0x9800 + 4 * 32 + x] for x in range(20)]
+        row = [self.vram(0x9800 + 4 * 32 + x) for x in range(20)]
         if TILE_V not in row:
             die("a fomenuben nem latszik a verzioszam (4. sor): %s" % row)
         if cont:
@@ -127,8 +131,8 @@ class Game:
     def check_progress(self, q):
         """a kerdeskepernyo jobb felso '<q+1>/5' kijelzese (2. tile-sor)"""
         row = 0x9800 + 2 * 32
-        if self.py.memory[row + 17] != TILE_DIGIT0 + 1 + q \
-           or self.py.memory[row + 19] != TILE_DIGIT0 + 5:
+        if self.vram(row + 17) != TILE_DIGIT0 + 1 + q \
+           or self.vram(row + 19) != TILE_DIGIT0 + 5:
             die("szett-allas: %d/5-ot vartam a kijelzon" % (q + 1))
 
     def play_set(self):
@@ -167,7 +171,8 @@ def main():
     if not g.row_inverted(0):
         die("a kijelolt (0.) sornak invertaltnak kene lennie")
     if g.mem("g_level") != 1 or g.mem("g_lives") != 3: die("kezdoertekek")
-    print("OK: uj jatek, 6x3-as szamlalo, kijeloles invertalva")
+    if g.mem("_cpu") != 0x11: die("CGB-modot vartam (_cpu=0x11), _cpu=%#x" % g.mem("_cpu"))
+    print("OK: uj jatek CGB-modban, 6x3-as szamlalo, kijeloles invertalva")
 
     complete_topic(g, 0)
     g.press("a"); g.wait_state(lambda s: s == ST["TOPIC"])
@@ -244,7 +249,24 @@ def main():
     g.press("a"); g.wait_state(lambda s: s == ST["MAINMENU"])
     print("OK: eletvesztes 1-es szinten -> game over -> fomenu")
 
+    # fomenu tilemap a CGB-futasbol (a DMG-osszehasonlitashoz)
+    cgb_menu = g.tilemap()
     py.stop(save=False)
+
+    # DMG-smoke: ugyanaz a ROM kenyszeritett DMG-modban (cgb=False + DMG
+    # boot-ROM): a fomenu tile-terkepe bitre azonos kell legyen - a szin
+    # csak attributum + paletta, a tile-adat nem valtozhat
+    import pyboy as _pyboy
+    dmg_boot = os.path.join(os.path.dirname(_pyboy.__file__), "core", "bootrom_dmg.bin")
+    py = PyBoy(ROM, window="null", cgb=False, bootrom=dmg_boot); py.set_emulation_speed(0)
+    g = Game(py, sym)
+    g.tick(120)
+    while g.state() != ST["MAINMENU"]: g.press("start")
+    g.tick(4)
+    if g.mem("_cpu") != 0x01: die("DMG-modot vartam (_cpu=0x01), _cpu=%#x" % g.mem("_cpu"))
+    if g.tilemap() != cgb_menu: die("a DMG fomenu tile-terkepe elter a CGB-tol")
+    py.stop(save=False)
+    print("OK: DMG-mod: _cpu=0x01, fomenu tilemap azonos a CGB-vel")
     print("\nE2E OK")
 
 if __name__ == "__main__":

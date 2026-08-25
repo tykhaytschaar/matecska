@@ -142,13 +142,14 @@ static void cat_draw(uint8_t spr, uint8_t x, uint8_t y, uint8_t flip)
     uint8_t lx = flip ? (uint8_t)(x + 8) : x;
     uint8_t rx = flip ? x : (uint8_t)(x + 8);
 
+    /* a 0-2. bit a CGB OBJ-paletta; DMG-n ezek a bitek hatastalanok */
     set_sprite_tile(0, tl);
     move_sprite(0, (uint8_t)(lx + OBJ_OX), (uint8_t)(y + OBJ_OY));
-    set_sprite_prop(0, flip ? S_FLIPX : 0);
+    set_sprite_prop(0, (uint8_t)((flip ? S_FLIPX : 0) | OBJ_PAL_CAT));
 
     set_sprite_tile(1, (uint8_t)(tl + 2));
     move_sprite(1, (uint8_t)(rx + OBJ_OX), (uint8_t)(y + OBJ_OY));
-    set_sprite_prop(1, flip ? S_FLIPX : 0);
+    set_sprite_prop(1, (uint8_t)((flip ? S_FLIPX : 0) | OBJ_PAL_CAT));
 }
 
 static void fx_hide(void)
@@ -159,7 +160,7 @@ static void fx_hide(void)
 static void fx_draw(uint8_t tile, uint8_t x, uint8_t y)
 {
     set_sprite_tile(2, tile);
-    set_sprite_prop(2, 0);
+    set_sprite_prop(2, (tile == FX_TILE_HEART) ? OBJ_PAL_HEART : OBJ_PAL_DROP);
     move_sprite(2, (uint8_t)(x + OBJ_OX), (uint8_t)(y + OBJ_OY));
 }
 
@@ -190,7 +191,7 @@ static void screen_title(void)
     print_at(1, 11, "*");  print_at(18, 11, "=");
     draw_bowl_at(4, 8, 0);            /* halas tal balra   */
     draw_bowl_at(14, 8, 2);           /* zoldseges jobbra  */
-    print_big(5, 13, "START", 8);     /* a logo (0..7) utani slotok */
+    print_big(5, 13, "START", 8, PAL_ACCENT);  /* a logo (0..7) utani slotok */
     print_center(16, "C 2026");
     DISPLAY_ON;
 
@@ -610,6 +611,7 @@ void main(void)
 {
     uint8_t keys, pressed, i;
 
+    g_color = (uint8_t)(_cpu == CGB_TYPE);   /* a render_init ELOTT */
     SPRITES_8x16;
     screen_off();
     render_init();

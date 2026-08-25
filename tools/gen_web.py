@@ -40,6 +40,7 @@ TEMPLATE = r"""<!doctype html>
            image-rendering:pixelated; image-rendering:crisp-edges; }
   #hint { font-size:12px; opacity:.85; text-align:center; line-height:1.7; }
   #hint a { color:var(--lite); }
+  body:not(.classic) canvas { background:#fdf6e3; }   /* CGB "papir" szin */
   body.embed h1, body.embed #hint { display:none; }
   body.embed { gap:8px; padding:6px; }
   #overlay { position:fixed; inset:0; background:rgba(15,56,15,.94);
@@ -91,7 +92,8 @@ TEMPLATE = r"""<!doctype html>
 <div id="hint">
   <span class="kbd">nyilak = mozgás &nbsp; A = A &nbsp; B = B &nbsp; Enter = START<br></span>
   v@@VER@@ &nbsp;·&nbsp; a mentés a böngészőben tárolódik (FOLYTATÁS újraindítás után is megy)<br>
-  <a id="dl" href="#" download="matecska.gb">matecska.gb letöltése (@@ROMKB@@ KB) – eredeti Game Boyra / emulátorba</a>
+  <a id="dl" href="#" download="matecska.gb">matecska.gb letöltése (@@ROMKB@@ KB) – eredeti Game Boyra / emulátorba</a><br>
+  megjelenítés: <a id="look" href="#">klasszikus zöld (Game Boy)</a>
 </div>
 <div id="overlay"><h1>MATECSKA</h1><b>KATT / ÉRINTS: INDÍTÁS</b></div>
 
@@ -124,6 +126,25 @@ function rescale() {
   canvas.style.height = (144 * s) + "px";
 }
 if (location.search.indexOf("pads") >= 0) document.body.classList.add("show-pads");
+/* megjelenites: szines (Game Boy Color) alapbol; ?dmg vagy a mentett
+ * valasztas -> klasszikus zold DMG-nezet. Ugyanaz a ROM fut mindkettoben,
+ * a wasmBoy a fejlec CGB-flagje alapjan bootol szinesben (isGbcEnabled). */
+var classic = false;
+try {
+  if (location.search.indexOf("dmg") >= 0) classic = true;
+  else if (location.search.indexOf("color") >= 0) classic = false;
+  else classic = (localStorage.getItem("matecska.look") === "dmg");
+} catch (e) { /* localStorage tiltva: marad a szines */ }
+if (classic) document.body.classList.add("classic");
+(function () {
+  var l = document.getElementById("look");
+  l.textContent = classic ? "színes (Game Boy Color)" : "klasszikus zöld (Game Boy)";
+  l.addEventListener("click", function (e) {
+    e.preventDefault();
+    try { localStorage.setItem("matecska.look", classic ? "color" : "dmg"); } catch (x) {}
+    location.reload();
+  });
+})();
 /* iframe-ben (pl. almos.me) a cim es a hint a befoglalo oldalon van */
 if (window.top !== window.self || location.search.indexOf("embed") >= 0)
   document.body.classList.add("embed");
@@ -201,13 +222,14 @@ function saveNow() {
 function boot(withAudio) {
   overlay.style.display = "none";
   console.log("MATECSKA boot, audio=" + withAudio);
-  WB.config({
+  var cfg = {
     isAudioEnabled: withAudio,
-    useGbcWhenOptional: false,
-    isGbcColorizationEnabled: false,   /* szurke kimenet + dmgTint */
-    updateGraphicsCallback: dmgTint,
+    isGbcEnabled: !classic,            /* CGB-flag + ez -> szines mod */
+    isGbcColorizationEnabled: false,   /* DMG-modban nyers szurke...  */
     gameboyFrameRate: 60
-  }, canvas)
+  };
+  if (classic) cfg.updateGraphicsCallback = dmgTint;  /* ...amit zoldre festunk */
+  WB.config(cfg, canvas)
   .then(function () { console.log("config OK");
                       return WB.loadROM(romBytes()); })
   .then(function () { console.log("loadROM OK");
@@ -220,7 +242,8 @@ function boot(withAudio) {
   .then(function () {
     console.log("play OK");
     started = true;
-    /* SRAM (FOLYTATAS) mentese a bongeszo tarolojaba */
+    /* SRAM (FOLYTATAS) mentese a bongeszo tarolojaba - a wasmBoy a
+       kazettahoz koti, ezert a szines es a klasszikus mod kozos mentest lat */
     setInterval(saveNow, 5000);
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) saveNow();

@@ -60,6 +60,11 @@ python3 -m venv .venv
 .venv/bin/pip install pyboy pillow
 ```
 
+A ROM CGB-kompatibilis, a PyBoy a fejléc alapján Game Boy Color módban
+bootol. A monokróm (DMG) utat kényszerített módban lehet nézni:
+`PyBoy(rom, cgb=False, bootrom=<site-packages>/pyboy/core/bootrom_dmg.bin)`
+— a `tools/test_e2e.py` és a `tools/shots.py --dmg` ezt csinálja.
+
 ## Opcionális: hUGETracker (zeneszerkesztés)
 
 Csak ha zenét írsz. Töltsd le a Mac buildet a
