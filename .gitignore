@@ -13,3 +13,8 @@ __pycache__/
 
 # szerkeszto swap-fajlok
 *.swp
+
+# generalt jatszooldal + ROM-masolat (make web); a CI a taghoz ujragyartja,
+# lokalisan build utan make web-bel probalhato
+web/index.html
+web/matecska.gb

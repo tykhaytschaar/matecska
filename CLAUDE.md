@@ -94,7 +94,8 @@ make clean
 ### Webes játszóoldal
 
 `make web` → `tools/gen_web.py` legenerálja a **web/index.html**-t:
-egyetlen önálló fájl, benne a vendorolt **wasmBoy** emulátor-mag
+egyetlen önálló fájl (generált, gitignore-olt — lokális kipróbáláshoz
+`make && make web`), benne a vendorolt **wasmBoy** emulátor-mag
 (`web/wasmboy.wasm.umd.js`, a wasm base64-ként beágyazva) és a friss ROM
 base64-ként. Fut `file://`-ról és bármilyen statikus hostról (GitHub
 Pages). Saját billentyű- (nyilak, A=A, B=B — Z/X is —, Enter=START) és
@@ -126,6 +127,10 @@ pusholása** (`git tag v0.2.0 && git push origin v0.2.0`). A
 release-t, `make test` + `make` + `make web`; sima `main`-pushnál ez csak
 ellenőrzés, tagnél a `web/` mappát (index.html + matecska.gb) publikálja
 is GitHub Pages-re: **https://tykhaytschaar.github.io/matecska/**
+Buktató: a repó `github-pages` environmentje csak a felsorolt refekről
+enged deployt — a `main` mellé a `v*` **tag**-szabály is fel van véve
+(Settings → Environments → github-pages), különben a tag-deploy job
+lépés nélkül elbukik.
 
 Az **almos.me** (Netlify) nem tárol semmit a játékból: a `_redirects`
 fájlja 200-as proxy-rewrite-tal a Pages-ről szolgálja ki a
