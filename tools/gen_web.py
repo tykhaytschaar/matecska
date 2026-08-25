@@ -5,8 +5,8 @@
 # a sablonba. Az eredmeny fuggoseg nelkul fut file://-rol vagy barmilyen
 # statikus hostrol (pl. GitHub Pages).
 #
-# Futtatas a repo gyokerebol (elotte: make):  python3 tools/gen_web.py
-# Vagy egyszeruen:  make web
+# Futtatas a repo gyokerebol (elotte: make):  python3 tools/gen_web.py [kimenet]
+# Vagy egyszeruen:  make web   (ill. make site -> az almos.me allapjaba)
 import base64
 import os
 import sys
@@ -242,9 +242,10 @@ def main():
         sys.exit("a lib '</script'-et tartalmaz, nem inline-olhato igy")
     rom_b64 = base64.b64encode(open(ROM, "rb").read()).decode("ascii")
 
+    out = sys.argv[1] if len(sys.argv) > 1 else OUT
     html = TEMPLATE.replace("@@LIB@@", lib).replace("@@ROM@@", rom_b64)
-    open(OUT, "w", encoding="utf-8").write(html)
-    print("kesz: %s (%d KB)" % (OUT, len(html) // 1024))
+    open(out, "w", encoding="utf-8").write(html)
+    print("kesz: %s (%d KB)" % (out, len(html) // 1024))
 
 
 if __name__ == "__main__":

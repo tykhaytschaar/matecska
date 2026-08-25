@@ -107,6 +107,12 @@ hang nélkül indul, konzol-log), `?pads` (asztali gépen is mutatja az
 érintőgombokat). ROM-frissítés után `make web`-et újra kell futtatni,
 mert a ROM bele van sütve az oldalba.
 
+`make site` ugyanezt az oldalt az **almos.me** testvérrepóba írja
+(`../almos.me/matecska/play.html`, útvonal: `SITE_PLAYER`), ahol a
+`matecska/index.html` allap iframe-ben ágyazza be, a főoldalon pedig
+kártya + nav-link mutat rá (i18n kulcsok: `projects.matecska.*`,
+`matecska.*`). ROM-változás után `make site` + commit az almos.me-ben.
+
 ### Fejlesztői környezet és debug-stratégia
 
 Mit és hogyan kell a gépre tenni (kötelező: Xcode CLT, GBDK-2020 arm64,
