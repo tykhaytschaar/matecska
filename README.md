@@ -32,6 +32,7 @@ export GBDK_HOME=$HOME/gbdk
 make test     # feladatgenerator gcc-vel, GBDK nelkul is megy
 make          # build/matecska.gb
 make run      # emulatorban
+make web      # bongeszos jatszooldal (web/index.html, onallo fajl)
 ```
 
 ## Mappak

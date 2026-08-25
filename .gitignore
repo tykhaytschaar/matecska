@@ -10,3 +10,6 @@ build/
 __pycache__/
 .DS_Store
 .venv/
+
+# szerkeszto swap-fajlok
+*.swp

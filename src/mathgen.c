@@ -208,7 +208,7 @@ static uint8_t mul_pick(uint8_t n, uint8_t k)
 
 static void gen_szorzas(MathQuestion *q, uint8_t d)
 {
-    static const uint16_t hi[4] = { 5, 10, 10, 12 };
+    static const uint16_t hi[4] = { 10, 10, 10, 12 };  /* 10x10-ig, 4. szinttol 12-ig */
     int16_t a, b, correct, pool[3], cand[6];
     uint8_t np = 0, len, n, i, j, nfree, idx;
 
@@ -254,7 +254,7 @@ static void gen_szorzas(MathQuestion *q, uint8_t d)
 /* ======================================================================= */
 static void gen_osztas(MathQuestion *q, uint8_t d)
 {
-    static const uint16_t hi[4] = { 5, 10, 10, 12 };
+    static const uint16_t hi[4] = { 10, 10, 10, 12 };  /* 10x10-ig, 4. szinttol 12-ig */
     int16_t b, qv, a, pool[3], cand[5];
     uint8_t np = 0, len;
 

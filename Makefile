@@ -36,6 +36,10 @@ assets:
 design:
 	cd tools && python3 gen_design.py
 
+# bongeszos jatszooldal: web/index.html (wasmBoy + ROM egyetlen fajlban)
+web: $(ROM)
+	python3 tools/gen_web.py
+
 # headless vegigjatszas PyBoy-jal (elotte: make; venv: lasd SETUP.md)
 e2e: $(ROM)
 	.venv/bin/python tools/test_e2e.py
@@ -49,4 +53,4 @@ test:
 clean:
 	rm -rf build
 
-.PHONY: all run assets design test e2e clean
+.PHONY: all run assets design test e2e web clean

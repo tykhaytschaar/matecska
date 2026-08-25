@@ -87,8 +87,21 @@ Mentés minden lezárt kérdés után. A FOLYTATAS ebből tölt vissza.
 ```sh
 make        # matecska.gb a build/ mappába
 make run    # SameBoy-ban indítja
+make web    # böngészős játszóoldal: web/index.html (lásd lejjebb)
 make clean
 ```
+
+### Webes játszóoldal
+
+`make web` → `tools/gen_web.py` legenerálja a **web/index.html**-t:
+egyetlen önálló fájl, benne a vendorolt **wasmBoy** emulátor-mag
+(`web/wasmboy.wasm.umd.js`, a wasm base64-ként beágyazva) és a friss ROM
+base64-ként. Fut `file://`-ról és bármilyen statikus hostról (GitHub
+Pages). Saját billentyű- (nyilak/WASD, Z=A, X=B, Enter=START) és
+érintőgomb-kezelés (`WasmBoy.setJoypadState`), a SRAM-mentést 5
+másodpercenként `saveLoadedCartridge()` írja a böngésző IndexedDB-jébe,
+így a FOLYTATÁS ott is működik. ROM-frissítés után `make web`-et újra
+kell futtatni, mert a ROM bele van sütve az oldalba.
 
 ### Fejlesztői környezet és debug-stratégia
 
