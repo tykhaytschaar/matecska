@@ -19,6 +19,9 @@
   canvas { display:block; background:var(--lite);
            image-rendering:pixelated; image-rendering:crisp-edges; }
   #hint { font-size:12px; opacity:.85; text-align:center; line-height:1.7; }
+  #hint a { color:var(--lite); }
+  body.embed h1, body.embed #hint { display:none; }
+  body.embed { gap:8px; padding:6px; }
   #overlay { position:fixed; inset:0; background:rgba(15,56,15,.94);
              display:flex; flex-direction:column; align-items:center;
              justify-content:center; gap:18px; cursor:pointer; z-index:9; }
@@ -66,11 +69,11 @@
 </div>
 <div id="startrow"><div class="btn" data-btn="START">START</div></div>
 <div id="hint">
-  <span class="kbd">nyilak = mozgas &nbsp; Z = A &nbsp; X = B &nbsp;
-  Enter = START &nbsp; Backspace = B<br></span>
-  a mentes a bongeszoben tarolodik (FOLYTATAS ujraindtas utan is megy)
+  <span class="kbd">nyilak = mozgás &nbsp; A = A &nbsp; B = B &nbsp; Enter = START<br></span>
+  a mentés a böngészőben tárolódik (FOLYTATÁS újraindítás után is megy)<br>
+  <a id="dl" href="#" download="matecska.gb">matecska.gb letöltése (64 KB) – eredeti Game Boyra / emulátorba</a>
 </div>
-<div id="overlay"><h1>MATECSKA</h1><b>KATT / ERINTS: INDITAS</b></div>
+<div id="overlay"><h1>MATECSKA</h1><b>KATT / ÉRINTS: INDÍTÁS</b></div>
 
 <script>'use strict';(function(Z,w){"object"===typeof exports&&"undefined"!==typeof module?w(exports):"function"===typeof define&&define.amd?define(["exports"],w):w(Z.WasmBoy={})})(this,function(Z){function w(a){return a.data?a.data:a}function ma(a,b){b=b||{};var c=a.numberOfChannels,d=a.sampleRate;b=b.float32?3:1;var e=3===b?32:16;if(2===c){var f=a.getChannelData(0);a=a.getChannelData(1);for(var g=f.length+a.length,p=new Float32Array(g),m=0,l=0;m<g;)p[m++]=f[l],p[m++]=a[l],l++;f=p}else f=a.getChannelData(0);
 p=e/8;m=c*p;a=new ArrayBuffer(44+f.length*p);g=new DataView(a);V(g,0,"RIFF");g.setUint32(4,36+f.length*p,!0);V(g,8,"WAVE");V(g,12,"fmt ");g.setUint32(16,16,!0);g.setUint16(20,b,!0);g.setUint16(22,c,!0);g.setUint32(24,d,!0);g.setUint32(28,d*m,!0);g.setUint16(32,m,!0);g.setUint16(34,e,!0);V(g,36,"data");g.setUint32(40,f.length*p,!0);if(1===b)for(c=44,d=0;d<f.length;d++,c+=2)b=Math.max(-1,Math.min(1,f[d])),g.setInt16(c,0>b?32768*b:32767*b,!0);else for(c=44,d=0;d<f.length;d++,c+=4)g.setFloat32(c,f[d],
@@ -289,6 +292,10 @@ function rescale() {
   canvas.style.height = (144 * s) + "px";
 }
 if (location.search.indexOf("pads") >= 0) document.body.classList.add("show-pads");
+/* iframe-ben (pl. almos.me) a cim es a hint a befoglalo oldalon van */
+if (window.top !== window.self || location.search.indexOf("embed") >= 0)
+  document.body.classList.add("embed");
+document.getElementById("dl").href = "data:application/octet-stream;base64," + ROM_B64;
 window.addEventListener("resize", rescale);
 rescale();
 
@@ -314,8 +321,8 @@ function setBtn(b, down) {
 
 var KEYS = {
   "arrowup":"UP", "arrowdown":"DOWN", "arrowleft":"LEFT", "arrowright":"RIGHT",
-  "w":"UP", "s":"DOWN", "a":"LEFT", "d":"RIGHT",
-  "z":"A", "y":"A", "x":"B", "backspace":"B",
+  "a":"A", "b":"B",            /* a billentyu = a Game Boy gomb */
+  "z":"A", "x":"B",            /* csendes alternativa */
   "enter":"START", "shift":"SELECT"
 };
 function onKey(e, down) {

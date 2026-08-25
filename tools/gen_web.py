@@ -37,6 +37,9 @@ TEMPLATE = r"""<!doctype html>
   canvas { display:block; background:var(--lite);
            image-rendering:pixelated; image-rendering:crisp-edges; }
   #hint { font-size:12px; opacity:.85; text-align:center; line-height:1.7; }
+  #hint a { color:var(--lite); }
+  body.embed h1, body.embed #hint { display:none; }
+  body.embed { gap:8px; padding:6px; }
   #overlay { position:fixed; inset:0; background:rgba(15,56,15,.94);
              display:flex; flex-direction:column; align-items:center;
              justify-content:center; gap:18px; cursor:pointer; z-index:9; }
@@ -84,11 +87,11 @@ TEMPLATE = r"""<!doctype html>
 </div>
 <div id="startrow"><div class="btn" data-btn="START">START</div></div>
 <div id="hint">
-  <span class="kbd">nyilak = mozgas &nbsp; Z = A &nbsp; X = B &nbsp;
-  Enter = START &nbsp; Backspace = B<br></span>
-  a mentes a bongeszoben tarolodik (FOLYTATAS ujraindtas utan is megy)
+  <span class="kbd">nyilak = mozgás &nbsp; A = A &nbsp; B = B &nbsp; Enter = START<br></span>
+  a mentés a böngészőben tárolódik (FOLYTATÁS újraindítás után is megy)<br>
+  <a id="dl" href="#" download="matecska.gb">matecska.gb letöltése (@@ROMKB@@ KB) – eredeti Game Boyra / emulátorba</a>
 </div>
-<div id="overlay"><h1>MATECSKA</h1><b>KATT / ERINTS: INDITAS</b></div>
+<div id="overlay"><h1>MATECSKA</h1><b>KATT / ÉRINTS: INDÍTÁS</b></div>
 
 <script>@@LIB@@</script>
 <script>
@@ -119,6 +122,10 @@ function rescale() {
   canvas.style.height = (144 * s) + "px";
 }
 if (location.search.indexOf("pads") >= 0) document.body.classList.add("show-pads");
+/* iframe-ben (pl. almos.me) a cim es a hint a befoglalo oldalon van */
+if (window.top !== window.self || location.search.indexOf("embed") >= 0)
+  document.body.classList.add("embed");
+document.getElementById("dl").href = "data:application/octet-stream;base64," + ROM_B64;
 window.addEventListener("resize", rescale);
 rescale();
 
@@ -144,8 +151,8 @@ function setBtn(b, down) {
 
 var KEYS = {
   "arrowup":"UP", "arrowdown":"DOWN", "arrowleft":"LEFT", "arrowright":"RIGHT",
-  "w":"UP", "s":"DOWN", "a":"LEFT", "d":"RIGHT",
-  "z":"A", "y":"A", "x":"B", "backspace":"B",
+  "a":"A", "b":"B",            /* a billentyu = a Game Boy gomb */
+  "z":"A", "x":"B",            /* csendes alternativa */
   "enter":"START", "shift":"SELECT"
 };
 function onKey(e, down) {
@@ -243,9 +250,14 @@ def main():
     rom_b64 = base64.b64encode(open(ROM, "rb").read()).decode("ascii")
 
     out = sys.argv[1] if len(sys.argv) > 1 else OUT
-    html = TEMPLATE.replace("@@LIB@@", lib).replace("@@ROM@@", rom_b64)
+    rom = open(ROM, "rb").read()
+    html = (TEMPLATE.replace("@@LIB@@", lib).replace("@@ROM@@", rom_b64)
+                    .replace("@@ROMKB@@", str(len(rom) // 1024)))
     open(out, "w", encoding="utf-8").write(html)
-    print("kesz: %s (%d KB)" % (out, len(html) // 1024))
+    # a ROM fajlkent is a kimenet melle (letoltes-link a befoglalo oldalon)
+    rom_out = os.path.join(os.path.dirname(os.path.abspath(out)), "matecska.gb")
+    open(rom_out, "wb").write(rom)
+    print("kesz: %s (%d KB) + %s" % (out, len(html) // 1024, rom_out))
 
 
 if __name__ == "__main__":
