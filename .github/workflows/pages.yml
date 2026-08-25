@@ -1,0 +1,57 @@
+# MATECSKA - build + GitHub Pages deploy
+#
+# Minden main-re torteno push: GBDK-2020 letoltese, ROM forditas, nativ
+# teszt, a bongeszos jatszooldal generalasa (web/index.html + matecska.gb),
+# majd a web/ mappa publikalasa GitHub Pages-re. Az almos.me Netlify
+# proxyval erre a Pages-re mutat, ezert ott nem kell semmit deployolni.
+name: pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: GBDK-2020 (linux64)
+        run: |
+          curl -sL -o gbdk.tar.gz \
+            https://github.com/gbdk-2020/gbdk-2020/releases/latest/download/gbdk-linux64.tar.gz
+          tar xzf gbdk.tar.gz -C "$HOME"      # -> $HOME/gbdk
+          "$HOME/gbdk/bin/lcc" -v 2>&1 | head -2 || true
+
+      - name: Nativ teszt (mathgen)
+        run: make test
+
+      - name: ROM + jatszooldal
+        run: |
+          make GBDK_HOME="$HOME/gbdk"
+          make web GBDK_HOME="$HOME/gbdk"
+          ls -la web/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

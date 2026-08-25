@@ -6,6 +6,8 @@ fanyalog.
 
 ![cimkepernyo](design/cimkepernyo.png)
 
+**Jatszd a bongeszoben:** https://tykhaytschaar.github.io/matecska/ (a `.gb` is onnan toltheto le). Deploy: push a `main`-re -> GitHub Actions -> Pages.
+
 ## Allapot
 
 Jatszahato: cim-animacio, fomenu (uj jatek / folytatas SRAM-mentesbol),

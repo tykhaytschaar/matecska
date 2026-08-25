@@ -107,11 +107,21 @@ hang nélkül indul, konzol-log), `?pads` (asztali gépen is mutatja az
 érintőgombokat). ROM-frissítés után `make web`-et újra kell futtatni,
 mert a ROM bele van sütve az oldalba.
 
-`make site` ugyanezt az oldalt az **almos.me** testvérrepóba írja
-(`../almos.me/matecska/play.html`, útvonal: `SITE_PLAYER`), ahol a
-`matecska/index.html` allap iframe-ben ágyazza be, a főoldalon pedig
-kártya + nav-link mutat rá (i18n kulcsok: `projects.matecska.*`,
-`matecska.*`). ROM-változás után `make site` + commit az almos.me-ben.
+### Deploy — GitHub Pages + almos.me
+
+Repo: `github.com/tykhaytschaar/matecska` (public). **Push a `main`-re =
+deploy.** A `.github/workflows/pages.yml` Ubuntu runneren letölti a
+GBDK-2020 linux64 release-t, `make test` + `make` + `make web`, majd a
+`web/` mappát (index.html + matecska.gb) publikálja GitHub Pages-re:
+**https://tykhaytschaar.github.io/matecska/**
+
+Az **almos.me** (Netlify) nem tárol semmit a játékból: a `_redirects`
+fájlja 200-as proxy-rewrite-tal a Pages-ről szolgálja ki a
+`/matecska/play.html` és `/matecska/matecska.gb` címeket (same-origin,
+így a böngészős mentés is almos.me alatt marad). Az ottani
+`matecska/index.html` allap iframe-ben ágyazza be a `play.html`-t, a
+főoldalon kártya + nav-link mutat rá (i18n: `projects.matecska.*`,
+`matecska.*`). ROM-változáskor tehát csak ide kell pusholni.
 
 ### Fejlesztői környezet és debug-stratégia
 

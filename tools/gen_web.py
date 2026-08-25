@@ -6,7 +6,7 @@
 # statikus hostrol (pl. GitHub Pages).
 #
 # Futtatas a repo gyokerebol (elotte: make):  python3 tools/gen_web.py [kimenet]
-# Vagy egyszeruen:  make web   (ill. make site -> az almos.me allapjaba)
+# Vagy egyszeruen:  make web   (a CI is ezt futtatja, lasd .github/workflows)
 import base64
 import os
 import sys

@@ -40,11 +40,6 @@ design:
 web: $(ROM)
 	python3 tools/gen_web.py
 
-# a jatszooldal az almos.me weboldal allapjaba (testverrepo, lasd CLAUDE.md)
-SITE_PLAYER ?= ../almos.me/matecska/play.html
-site: $(ROM)
-	python3 tools/gen_web.py $(SITE_PLAYER)
-
 # headless vegigjatszas PyBoy-jal (elotte: make; venv: lasd SETUP.md)
 e2e: $(ROM)
 	.venv/bin/python tools/test_e2e.py
@@ -58,4 +53,4 @@ test:
 clean:
 	rm -rf build
 
-.PHONY: all run assets design test e2e web site clean
+.PHONY: all run assets design test e2e web clean
