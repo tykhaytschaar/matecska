@@ -70,7 +70,21 @@ typedef enum { DIR_DOWN, DIR_DL, DIR_DR } Direction;
 #define FX_TILE_HEART  (SPR_FX * 4)
 #define FX_TILE_DROP   (SPR_FX * 4 + 2)
 
+/* --- Game Boy Color palettak (indexek; az adat a render.c-ben) ----------- */
+/* A tile-rajz valtozatlan: a szin = attributum-terkep (VRAM 1. bank) +
+ * paletta. DMG-n mindez inaktiv (g_color == 0), a kep bitre a regi.      */
+#define PAL_TEXT       0   /* papir + tinta: minden sima szoveg           */
+#define PAL_HUD        1   /* sotet sav, vilagos szoveg (invertalt font)  */
+#define PAL_HUD_HEART  2   /* piros szivek a HUD-savon                    */
+#define PAL_SEL        3   /* temavalaszto kijelolt sora (narancs sav)    */
+#define PAL_ACCENT     4   /* logo, START, kijelolo keret                 */
+#define PAL_BOWL0      5   /* talak: PAL_BOWL0 + which (hal/szaraz/zoldseg) */
+#define OBJ_PAL_CAT    0
+#define OBJ_PAL_HEART  1
+#define OBJ_PAL_DROP   2
+
 /* --- globalis jatekallapot ---------------------------------------------- */
+extern uint8_t   g_color;       /* 1 = Game Boy Coloron futunk           */
 extern GameState g_state;
 extern uint8_t   g_lives;
 extern uint16_t  g_score;

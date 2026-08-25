@@ -13,9 +13,10 @@ SRC        = src/main.c src/mathgen.c src/render.c src/font_data.c
 HDRS       = $(wildcard src/*.h)
 OBJ        = $(SRC:src/%.c=build/%.o)
 
-# ROM fejlec: nev, MBC5+RAM+BATTERY (SRAM mentes a FOLYTATAS-hoz)
+# ROM fejlec: nev, MBC5+RAM+BATTERY (SRAM mentes a FOLYTATAS-hoz),
+# -Wm-yc: Game Boy Color KOMPATIBILIS (0x143=0x80) - DMG-n is fut; -yC tilos!
 # -Wl-j: .noi szimbolumfajl a headless teszthez (tools/test_e2e.py)
-LCCFLAGS   = -Wl-yt0x1B -Wl-yo4 -Wl-ya1 -Wl-j -Wm-yn"MATECSKA"
+LCCFLAGS   = -Wl-yt0x1B -Wl-yo4 -Wl-ya1 -Wl-j -Wm-yc -Wm-yn"MATECSKA"
 
 EMU       ?= open -a SameBoy
 

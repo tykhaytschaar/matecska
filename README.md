@@ -1,6 +1,6 @@
 # MATECSKA
 
-Game Boy (DMG) fejszamolos jatek. Random matekfeladat, harom valasz, es egy
+Game Boy / Game Boy Color fejszamolos jatek (egy ROM, DMG-n monokrom, Coloron szines). Random matekfeladat, harom valasz, es egy
 macska, aki a valasztott talbol eszik - ha jol tippeltel, orul, ha nem,
 fanyalog.
 

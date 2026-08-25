@@ -17,7 +17,8 @@ void print_u16(uint8_t x, uint8_t y, uint16_t v);
 
 void draw_logo(uint8_t y);           /* 1x logo (fomenu) */
 void draw_logo_big(uint8_t y);       /* 2x logo (cimkepernyo), 0..7 slot */
-void print_big(uint8_t x, uint8_t y, const char *s, uint8_t slot0);
+void print_big(uint8_t x, uint8_t y, const char *s, uint8_t slot0,
+               uint8_t pal);            /* pal: PAL_* (CGB), DMG-n kozombos */
 void draw_hud(void);                 /* g_score / g_lives / g_level alapjan */
 void draw_bowls(void);
 void draw_bowl_at(uint8_t tx, uint8_t ty, uint8_t which);  /* 0=hal 1=szaraz 2=zoldseg */

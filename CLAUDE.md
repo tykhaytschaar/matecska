@@ -170,6 +170,25 @@ Debug, ebben a sorrendben:
 - VRAM írás csak VBlank alatt biztonságos, vagy használd a GBDK
   `set_*_tiles` hívásait `wait_vbl_done()` után
 
+### Game Boy Color (dual-kompatibilis ROM)
+
+- A fejléc CGB-**kompatibilis** (`-Wm-yc`, 0x143=0x80): ugyanaz a ROM fut
+  DMG-n és Coloron. `g_color = (_cpu == CGB_TYPE)` a `main()` elején, a
+  `render_init()` ELŐTT; minden színkód e mögött van. DMG-n a VRAM-tartalom
+  és a kép bitre a régi (az E2E ezt ellenőrzi kényszerített DMG-módban).
+- **A tile-rajz nem változik.** Szín = attribútum-térkép (VRAM 1. bank,
+  tile-onként palettaindex) + 8 BG- és 8 OBJ-paletta (`render.c`:
+  `bg_pals`/`obj_pals`, `RGB8()`), a `render_init`-ben töltve (kijelző ki).
+- A `VBK_REG`-hez **csak** a `render.c` `attr_rect()` helpere nyúl, és
+  ugyanabban a blokkban visszaáll `VBK_TILES`-ra — különben minden későbbi
+  tile-írás a 1-es bankba menne. ISR-ből soha. Minden térkép-író függvény
+  (`print_map`, `big_put`, `draw_bowl_at`, `draw_hud`, `draw_cursor`, `cls`,
+  `draw_logo`) a tile-írás után ugyanarra a téglalapra `attr_rect`-et hív.
+- Sprite: az OAM attribútum 0–2. bitje a CGB OBJ-paletta (`OBJ_PAL_*`),
+  feltétel nélkül beírható (DMG-n hatástalan). `S_PALETTE` (0x10) a DMG
+  OBP1-bit — CGB-palettára NEM használható.
+- Nincs `cpu_fast()` — az időzítés DMG-vel azonos marad.
+
 ## Grafika
 
 ### Paletta (DMG)
@@ -179,6 +198,24 @@ Debug, ebben a sorrendben:
 | 1 | világos | `#8BAC0F` |
 | 2 | közép | `#306230` |
 | 3 | sötét (körvonal) | `#0F380F` |
+
+#### CGB-paletták (`game.h` `PAL_*` / `OBJ_PAL_*`, adat: `render.c`)
+
+| paletta | index-szerepek (0 / 1 / 2 / 3) | mit színez |
+|---|---|---|
+| `PAL_TEXT` 0 | papír / – / – / tinta | minden sima szöveg, üres háttér |
+| `PAL_HUD` 1 | fehér szöveg / – / – / sötét sáv | HUD-sor (invertált font) |
+| `PAL_HUD_HEART` 2 | piros / – / – / sötét sáv | szívek a HUD-on |
+| `PAL_SEL` 3 | fehér / – / – / narancs sáv | témaválasztó kijelölt sora |
+| `PAL_ACCENT` 4 | papír / – / – / hangsúly | logó, START, kijelölő keret |
+| `PAL_BOWL0`+0..2 | papír / világos / közép / kontúr | hal / száraz / zöldség tál |
+| `OBJ_PAL_CAT` 0 | átl. / vil. narancs / sötét narancs / fekete | macska |
+| `OBJ_PAL_HEART` 1, `OBJ_PAL_DROP` 2 | átl. / 3 árnyalat | szív ill. csepp effekt |
+
+A font csak a 0 és 3 indexet használja (az invertált font és a HUD
+fordítva), ezért a szöveg-palettáknál csak a két szélső szín számít. A
+tálak 0-s indexe (papír) egyezzen a `PAL_TEXT` papírjával, mert a tálak a
+papíron ülnek. Színhangolás: `tools/shots.py` (PyBoy CGB-képernyőképek).
 
 ### Sprite-ok — `src/sprites.h`
 Kész 2bpp tile-adat, minden sprite 16×16 = **64 bájt** = 2 db 8×16 OBJ
