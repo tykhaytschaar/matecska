@@ -11,7 +11,7 @@ fanyalog.
 ## Allapot
 
 Jatszahato: cim-animacio, fomenu (uj jatek / folytatas SRAM-mentesbol),
-7 feladattipus 5-os szettekben, pontozas/eletek/szintlepes.
+6 feladattipus 5-os szettekben, temankenti teljesites, szintlepes/szintvesztes.
 
 | resz | allapot |
 |---|---|
