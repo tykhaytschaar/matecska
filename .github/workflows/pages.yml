@@ -1,14 +1,16 @@
 # MATECSKA - build + GitHub Pages deploy
 #
 # Minden main-re torteno push: GBDK-2020 letoltese, ROM forditas, nativ
-# teszt, a bongeszos jatszooldal generalasa (web/index.html + matecska.gb),
-# majd a web/ mappa publikalasa GitHub Pages-re. Az almos.me Netlify
-# proxyval erre a Pages-re mutat, ezert ott nem kell semmit deployolni.
+# teszt, jatszooldal generalasa - ellenorzeskent (nem elesit).
+# DEPLOY CSAK v* TAG PUSHOLASAKOR: a web/ mappa (index.html + matecska.gb)
+# publikalasa GitHub Pages-re. Az almos.me Netlify proxyval erre a
+# Pages-re mutat, ezert ott nem kell semmit deployolni.
 name: pages
 
 on:
   push:
-    branches: [main]
+    branches: [main]      # csak build + teszt
+    tags: ['v*']          # build + teszt + DEPLOY
   workflow_dispatch:
 
 permissions:
@@ -25,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # teljes history + tagek a git describe-hoz
 
       - name: GBDK-2020 (linux64)
         run: |
@@ -43,11 +47,13 @@ jobs:
           ls -la web/
 
       - uses: actions/upload-pages-artifact@v3
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           path: web
 
   deploy:
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: github-pages

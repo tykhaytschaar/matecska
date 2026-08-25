@@ -15,6 +15,7 @@
 #include "mathgen.h"
 #include "render.h"
 #include "font.h"     /* ekezet-makrok (_AA, _EE, ...) */
+#include "version.h"  /* GENERALT: MATECSKA_VERSION (build/, a git tagbol) */
 
 /* ----------------------------------------------------------- globalisok */
 GameState g_state  = ST_TITLE;
@@ -212,6 +213,7 @@ static void screen_mainmenu(void)
     cls();
     cat_hide();
     draw_logo(2);
+    print_center(4, "V" MATECSKA_VERSION);
     g_has_save = save_valid();
     print_at(6, 8, _UU "J J" _AA "T" _EE "K");
     if (g_has_save) print_at(6, 10, "FOLYTAT" _AA "S");

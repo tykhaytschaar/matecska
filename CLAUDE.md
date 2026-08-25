@@ -107,13 +107,25 @@ hang nélkül indul, konzol-log), `?pads` (asztali gépen is mutatja az
 érintőgombokat). ROM-frissítés után `make web`-et újra kell futtatni,
 mert a ROM bele van sütve az oldalba.
 
+### Verziózás
+
+Egyetlen forrás: a **git `v*` tag**. A `tools/version.sh` (`git describe`)
+adja a szöveget: tagen állva `0.1.0`, a tag után N committal `0.1.0+N`,
+piszkos working tree-nél `*` a végén, tag nélkül `0.0.0+<SHA>`. A Makefile
+ebből generálja a `build/version.h`-t (`MATECSKA_VERSION`, csak akkor írja
+újra, ha változott), a főmenü a logó alatt írja ki (`V0.1.0`, 4. sor), a
+`gen_web.py` a játszóoldal hintjébe teszi. **Kiadás = `git tag vX.Y.Z` +
+a tag pusholása** — csak ez deployol; sima push csak buildel/tesztel. (A
+CI `fetch-depth: 0`-val checkoutol, hogy lássa a tageket.)
+
 ### Deploy — GitHub Pages + almos.me
 
-Repo: `github.com/tykhaytschaar/matecska` (public). **Push a `main`-re =
-deploy.** A `.github/workflows/pages.yml` Ubuntu runneren letölti a
-GBDK-2020 linux64 release-t, `make test` + `make` + `make web`, majd a
-`web/` mappát (index.html + matecska.gb) publikálja GitHub Pages-re:
-**https://tykhaytschaar.github.io/matecska/**
+Repo: `github.com/tykhaytschaar/matecska` (public). **Deploy = `v*` tag
+pusholása** (`git tag v0.2.0 && git push origin v0.2.0`). A
+`.github/workflows/pages.yml` Ubuntu runneren letölti a GBDK-2020 linux64
+release-t, `make test` + `make` + `make web`; sima `main`-pushnál ez csak
+ellenőrzés, tagnél a `web/` mappát (index.html + matecska.gb) publikálja
+is GitHub Pages-re: **https://tykhaytschaar.github.io/matecska/**
 
 Az **almos.me** (Netlify) nem tárol semmit a játékból: a `_redirects`
 fájlja 200-as proxy-rewrite-tal a Pages-ről szolgálja ki a

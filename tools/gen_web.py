@@ -9,11 +9,13 @@
 # Vagy egyszeruen:  make web   (a CI is ezt futtatja, lasd .github/workflows)
 import base64
 import os
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LIB = os.path.join(ROOT, "web", "wasmboy.wasm.umd.js")
 ROM = os.path.join(ROOT, "build", "matecska.gb")
+VERSION_SH = os.path.join(ROOT, "tools", "version.sh")
 OUT = os.path.join(ROOT, "web", "index.html")
 
 TEMPLATE = r"""<!doctype html>
@@ -88,7 +90,7 @@ TEMPLATE = r"""<!doctype html>
 <div id="startrow"><div class="btn" data-btn="START">START</div></div>
 <div id="hint">
   <span class="kbd">nyilak = mozgás &nbsp; A = A &nbsp; B = B &nbsp; Enter = START<br></span>
-  a mentés a böngészőben tárolódik (FOLYTATÁS újraindítás után is megy)<br>
+  v@@VER@@ &nbsp;·&nbsp; a mentés a böngészőben tárolódik (FOLYTATÁS újraindítás után is megy)<br>
   <a id="dl" href="#" download="matecska.gb">matecska.gb letöltése (@@ROMKB@@ KB) – eredeti Game Boyra / emulátorba</a>
 </div>
 <div id="overlay"><h1>MATECSKA</h1><b>KATT / ÉRINTS: INDÍTÁS</b></div>
@@ -251,8 +253,14 @@ def main():
 
     out = sys.argv[1] if len(sys.argv) > 1 else OUT
     rom = open(ROM, "rb").read()
+    try:
+        ver = subprocess.check_output(["sh", VERSION_SH], text=True).strip()
+    except (OSError, subprocess.CalledProcessError):
+        ver = "dev"
+
     html = (TEMPLATE.replace("@@LIB@@", lib).replace("@@ROM@@", rom_b64)
-                    .replace("@@ROMKB@@", str(len(rom) // 1024)))
+                    .replace("@@ROMKB@@", str(len(rom) // 1024))
+                    .replace("@@VER@@", ver))
     open(out, "w", encoding="utf-8").write(html)
     # a ROM fajlkent is a kimenet melle (letoltes-link a befoglalo oldalon)
     rom_out = os.path.join(os.path.dirname(os.path.abspath(out)), "matecska.gb")

@@ -26,6 +26,7 @@ NOI = os.path.join(ROOT, "build", "matecska.noi")
 ST = dict(TITLE=0, MAINMENU=1, TOPIC=2, QUESTION=3, WALK=4, EAT=5, REACT=6,
           REVEAL=7, MSG=8, GAMEOVER=9)
 TILE_DIGIT0 = 24          # font_map['0' - 32]
+TILE_V = 21               # font_map['V' - 32]
 INV_BASE = 203            # render.c: futasidoben invertalt keszlet
 TOPICS = 6
 
@@ -77,6 +78,11 @@ class Game:
         self.tick(120)
         while self.state() != ST["MAINMENU"]:
             self.press("start")
+        self.tick(4)
+        # verzio a logo alatt (4. sor): "V<major>.<minor>.<patch>"
+        row = [self.py.memory[0x9800 + 4 * 32 + x] for x in range(20)]
+        if TILE_V not in row:
+            die("a fomenuben nem latszik a verzioszam (4. sor): %s" % row)
         if cont:
             self.press("down")
         self.press("a")

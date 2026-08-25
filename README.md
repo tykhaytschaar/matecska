@@ -6,7 +6,8 @@ fanyalog.
 
 ![cimkepernyo](design/cimkepernyo.png)
 
-**Jatszd a bongeszoben:** https://tykhaytschaar.github.io/matecska/ (a `.gb` is onnan toltheto le). Deploy: push a `main`-re -> GitHub Actions -> Pages.
+**Jatszd a bongeszoben:** https://tykhaytschaar.github.io/matecska/ (a `.gb` is onnan toltheto le). Deploy: `vX.Y.Z` tag pusholasa -> GitHub Actions -> Pages (sima push csak buildel/tesztel).
+Verzio: a git `vX.Y.Z` tagbol (`tools/version.sh`), a fomenuben is latszik; kiadas = tag + push.
 
 ## Allapot
 

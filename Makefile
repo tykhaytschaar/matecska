@@ -4,6 +4,10 @@
 GBDK_HOME ?= $(HOME)/gbdk
 LCC        = $(GBDK_HOME)/bin/lcc
 
+# verzio: egyetlen forras a git v* tag (tools/version.sh -> build/version.h;
+# a gen_web.py is ezt a szkriptet hivja)
+VERSION   := $(strip $(shell sh tools/version.sh))
+
 ROM        = build/matecska.gb
 SRC        = src/main.c src/mathgen.c src/render.c src/font_data.c
 HDRS       = $(wildcard src/*.h)
@@ -20,8 +24,16 @@ all: $(ROM)
 build:
 	mkdir -p build
 
-build/%.o: src/%.c $(HDRS) | build
-	$(LCC) $(LCCFLAGS) -c -o $@ $<
+# mindig kiertekelodik, de csak akkor irodik ujra, ha valtozott (ne forduljon
+# ujra minden objektum feleslegesen)
+build/version.h: FORCE | build
+	@printf '/* GENERALT a git tagbol (tools/version.sh) - ne szerkeszd */\n#define MATECSKA_VERSION "%s"\n' "$(VERSION)" > $@.tmp
+	@cmp -s $@.tmp $@ || { mv $@.tmp $@; echo "version.h: $(VERSION)"; }
+	@rm -f $@.tmp
+FORCE:
+
+build/%.o: src/%.c $(HDRS) build/version.h | build
+	$(LCC) $(LCCFLAGS) -Ibuild -c -o $@ $<
 
 $(ROM): $(OBJ)
 	$(LCC) $(LCCFLAGS) -o $@ $(OBJ)
@@ -53,4 +65,4 @@ test:
 clean:
 	rm -rf build
 
-.PHONY: all run assets design test e2e web clean
+.PHONY: all run assets design test e2e web clean FORCE
