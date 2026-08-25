@@ -450,7 +450,7 @@ static void mainmenu_update(uint8_t pressed)
         mainmenu_cursor();
     }
     if (pressed & J_B) { screen_title(); return; }
-    if (pressed & (J_A | J_START)) {
+    if (pressed & J_A) {
         if (g_menu_sel == 1) {
             save_load();
         } else {
@@ -473,7 +473,7 @@ static void topic_update(uint8_t pressed)
     if ((pressed & J_DOWN) && g_menu_sel < (uint8_t)(mg_topic_count - 1))
         topic_select((uint8_t)(g_menu_sel + 1));
     if (pressed & J_B) { screen_mainmenu(); return; }
-    if (pressed & (J_A | J_START)) {
+    if (pressed & J_A) {
         g_topic = g_menu_sel;
         start_set();
     }
@@ -485,6 +485,14 @@ static void question_update(uint8_t pressed)
     if ((pressed & J_LEFT)  && g_cursor > 0) { g_cursor--; draw_cursor(g_cursor); }
     if ((pressed & J_RIGHT) && g_cursor < 2) { g_cursor++; draw_cursor(g_cursor); }
 
+    if (pressed & J_B) {
+        /* visszalepes: a szett megszakad (nem hibatlan -> a tema sorozata
+         * nullazodik), elet nem vesz el */
+        g_tstreak[g_topic] = 0;
+        save_write();
+        screen_topic();
+        return;
+    }
     if (pressed & J_A) {
         g_dir   = (g_cursor == 0) ? DIR_DL : (g_cursor == 2 ? DIR_DR : DIR_DOWN);
         g_state = ST_WALK;
@@ -592,7 +600,7 @@ static void react_update(void)
 /* -------------------------------------------------------------- REVEAL */
 static void reveal_update(uint8_t pressed)
 {
-    if (pressed & (J_A | J_START)) end_question();
+    if (pressed & J_A) end_question();
 }
 
 /* ------------------------------------------------------------------ fo */
@@ -627,10 +635,10 @@ void main(void)
             case ST_REACT:    react_update();           break;
             case ST_REVEAL:   reveal_update(pressed);   break;
             case ST_MSG:
-                if (pressed & (J_A | J_START)) screen_topic();
+                if (pressed & J_A) screen_topic();
                 break;
             case ST_GAMEOVER:
-                if (pressed & (J_A | J_START)) screen_mainmenu();
+                if (pressed & J_A) screen_mainmenu();
                 break;
         }
 

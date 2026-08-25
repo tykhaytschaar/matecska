@@ -100,8 +100,12 @@ base64-ként. Fut `file://`-ról és bármilyen statikus hostról (GitHub
 Pages). Saját billentyű- (nyilak/WASD, Z=A, X=B, Enter=START) és
 érintőgomb-kezelés (`WasmBoy.setJoypadState`), a SRAM-mentést 5
 másodpercenként `saveLoadedCartridge()` írja a böngésző IndexedDB-jébe,
-így a FOLYTATÁS ott is működik. ROM-frissítés után `make web`-et újra
-kell futtatni, mert a ROM bele van sütve az oldalba.
+így a FOLYTATÁS ott is működik. Érintőgombok: D-pad balra, A jobbra-fent /
+B balra-lent átlósan (Game Boy-elrendezés), START alul középen — csak
+érintőkijelzőn jelennek meg. Debug URL-kapcsolók: `?autostart` (katt és
+hang nélkül indul, konzol-log), `?pads` (asztali gépen is mutatja az
+érintőgombokat). ROM-frissítés után `make web`-et újra kell futtatni,
+mert a ROM bele van sütve az oldalba.
 
 ### Fejlesztői környezet és debug-stratégia
 
@@ -264,7 +268,10 @@ Az MSG a szett végi üzenetképernyő (téma teljesítve / szintlépés /
 szintvesztés), A-ra lép vissza a TOPIC-ra. Az életek elfogyása 2-es
 szinttől MSG-be visz (szintvesztés), csak 1-es szinten GAMEOVER-be.
 
-B gombbal: TOPIC → MAINMENU → TITLE.
+**Gombszerepek:** **A** = akció (menüpont, tál kiválasztása, üzenet
+továbbléptetése), **B** = visszalépés: QUESTION → TOPIC (a szett megszakad,
+a téma sorozata nullázódik, élet nem vész el), TOPIC → MAINMENU → TITLE.
+START csak a címképernyőn indít; a B sehol nem akció.
 
 ## Feladatgenerátor és feladattípusok
 

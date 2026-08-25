@@ -43,20 +43,29 @@ TEMPLATE = r"""<!doctype html>
   #overlay h1 { font-size:26px; }
   #overlay b { font-size:18px; letter-spacing:2px; border:2px solid var(--lite);
                padding:12px 30px; border-radius:6px; }
-  /* erintogombok - csak erintokijelzon latszanak */
-  #pads { display:none; width:100%; max-width:520px;
-          justify-content:space-between; align-items:flex-end; gap:10px; }
+  /* erintogombok - csak erintokijelzon latszanak (teszt: ?pads) */
+  #pads { display:none; align-items:center; justify-content:center;
+          gap:28px; margin-top:4px; }
   @media (pointer:coarse) { #pads { display:flex; } .kbd { display:none; } }
-  .dpad { display:grid; grid-template-columns:repeat(3,52px);
-          grid-template-rows:repeat(3,52px); gap:2px; }
+  body.show-pads #pads { display:flex; }
   .btn  { background:var(--mid); color:var(--lite); border:2px solid var(--lite);
           border-radius:10px; font:bold 15px monospace;
           display:flex; align-items:center; justify-content:center; }
   .btn.press { background:var(--lite); color:var(--bg); }
-  .mid  { display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .mid .btn { width:92px; height:34px; font-size:12px; border-radius:17px; }
-  .ab   { display:flex; gap:16px; align-items:flex-end; }
-  .ab .btn { width:62px; height:62px; border-radius:50%; font-size:20px; }
+  /* D-pad: 3x3 racs, 46px-es cellak -> 142px */
+  .dpad { display:grid; grid-template-columns:repeat(3,46px);
+          grid-template-rows:repeat(3,46px); gap:2px; }
+  /* A fent jobbra, B lent balra - a Game Boy atlos elrendezese */
+  .ab   { position:relative; width:118px; height:118px; }
+  .ab .btn { position:absolute; width:60px; height:60px; border-radius:50%;
+             font-size:20px; }
+  .ab .a { top:0; right:0; }
+  .ab .b { bottom:0; left:0; }
+  /* START kulon sorban, kozepen */
+  #startrow { display:none; justify-content:center; margin-top:2px; }
+  @media (pointer:coarse) { #startrow { display:flex; } }
+  body.show-pads #startrow { display:flex; }
+  #startrow .btn { width:96px; height:32px; font-size:12px; border-radius:16px; }
 </style>
 </head>
 <body>
@@ -68,12 +77,12 @@ TEMPLATE = r"""<!doctype html>
     <div class="btn" data-btn="LEFT">&#9664;</div><div></div><div class="btn" data-btn="RIGHT">&#9654;</div>
     <div></div><div class="btn" data-btn="DOWN">&#9660;</div><div></div>
   </div>
-  <div class="mid"><div class="btn" data-btn="START">START</div></div>
   <div class="ab">
-    <div class="btn" data-btn="B">B</div>
-    <div class="btn" data-btn="A">A</div>
+    <div class="btn a" data-btn="A">A</div>
+    <div class="btn b" data-btn="B">B</div>
   </div>
 </div>
+<div id="startrow"><div class="btn" data-btn="START">START</div></div>
 <div id="hint">
   <span class="kbd">nyilak = mozgas &nbsp; Z = A &nbsp; X = B &nbsp;
   Enter = START &nbsp; Backspace = B<br></span>
@@ -102,13 +111,14 @@ var started = false;
 /* --- meretezes: a legnagyobb egesz szorzo, ami elfer ------------------- */
 function rescale() {
   var pads = document.getElementById("pads");
-  var padH = (getComputedStyle(pads).display !== "none") ? 220 : 90;
+  var padH = (getComputedStyle(pads).display !== "none") ? 250 : 90;
   var s = Math.min((window.innerWidth - 44) / 160,
                    (window.innerHeight - padH) / 144);
   s = Math.max(1, Math.floor(s));
   canvas.style.width  = (160 * s) + "px";
   canvas.style.height = (144 * s) + "px";
 }
+if (location.search.indexOf("pads") >= 0) document.body.classList.add("show-pads");
 window.addEventListener("resize", rescale);
 rescale();
 

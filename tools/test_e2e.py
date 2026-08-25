@@ -180,6 +180,15 @@ def main():
             % g.mem("g_lives"))
     print("OK: hiba utan a szett megszakad; kesz temaban eletet sem visz")
 
+    # B a kerdesnel: visszalepes a valasztora, elet nem vesz el, a tema
+    # szamlaloja (friss temanal) 3 marad
+    g.select_topic(1)
+    g.press("b")
+    g.wait_state(lambda s: s == ST["TOPIC"])
+    if g.mem("g_lives") != 3 or g.remaining().get(1) != 3:
+        die("B-visszalepes utan lives=%d, rem=%s" % (g.mem("g_lives"), g.remaining()))
+    print("OK: B a kerdesnel -> vissza a valasztora")
+
     mul_before = g.mul_mask()
     py.stop()                                 # battery .ram kiirasa
     py = PyBoy(ROM, window="null"); py.set_emulation_speed(0)
